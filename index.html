@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narrenfahrplan 2027 – Fasnet Salmendingen</title>
+  <meta name="description" content="Der offizielle Narrenfahrplan für die Fasnet 2027 in Salmendingen. Alle Termine vom Fasnetsbeginn am 11.11. über Narrenbaumstellen bis zum großen Rosenmontagsumzug.">
+  <meta name="keywords" content="Fasnet Salmendingen, Narrenfahrplan 2027, Elferrat Salmendingen, Fasnetsbeginn, Fasching, Rosenmontag, Rathaussturm, Salmendingen">
+  
+  <!-- Favicon / Mascot -->
+  <link rel="icon" type="image/png" href="./assets/img/kappe.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/fahrplan.css">
+</head>
+<body>
+
+  <!-- Sticky Header & Navigation -->
+  <header class="site-header" id="site-header">
+    <div class="container nav-container">
+      <a href="./index.html" class="nav-brand" aria-label="Fasnet 2027 Salmendingen Startseite">
+        <img src="./assets/img/elferrat_logo_web.png" alt="Elferrat Salmendingen Logo" class="nav-brand-logo">
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">Fasnet 2027</span>
+          <span class="nav-brand-sub">Salmendingen</span>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" aria-label="Menü öffnen" id="mobile-toggle">
+        ☰
+      </button>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./index.html" class="nav-link active">Narrenfahrplan</a></li>
+        <li>
+          <a href="./petzen.html" class="nav-link nav-btn-petzen" title="Anonyme Geschichten einreichen">
+            Petzen 🤫
+          </a>
+        </li>
+        <li>
+          <button class="nav-btn-confetti" data-action="confetti" title="Konfetti regnen lassen">
+            🎉 Konfetti!
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-pattern"></div>
+      <div class="hero-streamers"></div>
+      <div class="container hero-container-full">
+        <div class="hero-header-content">
+          <div class="hero-kappe-badge">
+            <img src="./assets/img/kappe.png" alt="Salmendinger Narrenkappe">
+          </div>
+          <h1 class="hero-title">
+            Narrenfahrplan <span class="hero-title-accent">2027</span>
+          </h1>
+          <p class="hero-lead">
+            Alle Termine, Umzüge und Highlights der Salmendinger Fasnet auf einen Blick!
+          </p>
+          <div class="hero-actions">
+            <a href="#fahrplan" class="btn btn-primary">
+              📅 Zum Fahrplan
+            </a>
+            <a href="./petzen.html" class="btn btn-petzen">
+              🤫 Geschichte petzen
+            </a>
+            <button class="btn btn-secondary" data-action="confetti">
+              🎉 Konfetti werfen
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Countdown: Across the Whole Horizontal -->
+        <div class="hero-countdown-horizontal">
+          <div class="countdown-bar-header">
+            <div class="countdown-tag-badge">Nächstes Highlight</div>
+            <div class="countdown-event-name" id="countdown-event-name">Fasnetsbeginn (11.11.)</div>
+          </div>
+          <div class="countdown-timer-horizontal">
+            <div class="countdown-unit">
+              <span class="countdown-number" id="countdown-days">00</span>
+              <span class="countdown-label">Tage</span>
+            </div>
+            <div class="countdown-unit">
+              <span class="countdown-number" id="countdown-hours">00</span>
+              <span class="countdown-label">Stunden</span>
+            </div>
+            <div class="countdown-unit">
+              <span class="countdown-number" id="countdown-mins">00</span>
+              <span class="countdown-label">Minuten</span>
+            </div>
+            <div class="countdown-unit">
+              <span class="countdown-number" id="countdown-secs">00</span>
+              <span class="countdown-label">Sekunden</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Narrenfahrplan Section -->
+    <section class="container" id="fahrplan">
+      <div class="fahrplan-controls">
+        <div class="filter-pills">
+          <button class="filter-btn active" data-filter="all">Alle Termine</button>
+          <button class="filter-btn" data-filter="hauptfasnet">🔥 Hauptfasnet</button>
+          <button class="filter-btn" data-filter="umzug">🎭 Umzüge</button>
+          <button class="filter-btn" data-filter="tradition">🏛 Tradition</button>
+          <button class="filter-btn" data-filter="party">🍻 Feiern &amp; Party</button>
+          <button class="filter-btn" data-filter="kinder">👨‍👩‍👧 Kinder &amp; Familie</button>
+        </div>
+
+        <button class="export-all-btn" id="export-all-ics-btn" title="Alle 10 Fasnet-Termine auf einmal in dein Handy/Outlook importieren">
+          📥 Alle Termine (.ics) exportieren
+        </button>
+      </div>
+
+      <!-- Timeline Cards Container -->
+      <div class="events-container" id="events-container">
+        <!-- Rendered dynamically by js/fahrplan.js -->
+      </div>
+
+      <!-- Petzen Banner -->
+      <section class="petzen-banner">
+        <div class="petzen-banner-content">
+          <div>
+            <h2 class="petzen-banner-quote">
+              „Jessas Jessas heidanei, s wird doch nix bassiert sei... oder doch?“
+            </h2>
+            <p class="petzen-banner-text">
+              Kuriose Panne beobachtet oder Dorfklatsch aufgeschnappt? Erzähle uns deine Geschichte für den Salmendinger Narrenspiegel 2027 – 100% anonym!
+            </p>
+          </div>
+          <div class="petzen-banner-cta">
+            <a href="./petzen.html" class="btn btn-petzen petzen-banner-btn">
+              Jetzt Petzen gehen 🤫
+            </a>
+            <span class="petzen-banner-sub">100% Anonym • Keine Speicherung von Namen</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flyer Archive & Rückblick -->
+      <section class="archive-section">
+        <div class="archive-header">
+          <h2 class="archive-title">Rückblick: So war das Programm 2026</h2>
+          <p class="archive-subtitle">
+            Die originale Programmübersicht aus dem Vorjahr zum Vergleich und In-Erinnerung-Schwelgen.
+          </p>
+        </div>
+        <div class="flyer-grid">
+          <div class="flyer-thumb-card">
+            <img src="./assets/img/flyer_2026_1.jpg" alt="Narrenfahrplan Flyer 2026 Teil 1">
+            <div class="flyer-thumb-caption">Narrenfahrplan 2026 – Teil 1</div>
+          </div>
+          <div class="flyer-thumb-card">
+            <img src="./assets/img/flyer_2026_2.jpg" alt="Narrenfahrplan Flyer 2026 Teil 2">
+            <div class="flyer-thumb-caption">Narrenfahrplan 2026 – Teil 2</div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Floating Audio Player Bar -->
+  <aside class="audio-player-bar" id="audio-player-bar" aria-label="Fasnetsmusik Player">
+    <audio id="site-audio" preload="auto" playsinline src="./assets/audio/geilste_galaxie.mp3"></audio>
+    <div class="player-cover">
+      <img src="./assets/img/elferrat_mascot.jpg" alt="Album Cover">
+    </div>
+    <div class="player-track-info">
+      <span class="player-track-title" id="player-title">Geilste Galaxie</span>
+      <span class="player-track-artist" id="player-artist">Elferrat Salmendingen</span>
+    </div>
+    <div class="player-controls">
+      <button class="player-btn" id="player-prev-btn" title="Vorheriges Lied" aria-label="Vorheriges Lied">⏮</button>
+      <button class="player-btn player-btn-main" id="player-play-btn" title="Abspielen / Pause" aria-label="Abspielen / Pause">▶</button>
+      <button class="player-btn" id="player-next-btn" title="Nächstes Lied" aria-label="Nächstes Lied">⏭</button>
+    </div>
+    <div class="player-extra-controls">
+      <button class="player-toggle-btn" id="player-minimize-btn" title="Player minimieren" aria-label="Player minimieren">—</button>
+    </div>
+  </aside>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <img src="./assets/img/elferrat_logo_web.png" alt="Elferrat Logo" class="footer-logo">
+          <div class="footer-brand-title">Elferrat Salmendingen</div>
+        </div>
+        <p class="footer-brand-desc">
+          Fasnetstradition, Brauchtumspflege und heitere Geselligkeit auf den Höhen des Kornbühls.
+        </p>
+        <div class="footer-salute">Narri – Narro! 🎭</div>
+      </div>
+
+      <div>
+        <h3 class="footer-col-title">Navigation</h3>
+        <ul class="footer-links">
+          <li><a href="./index.html" class="footer-link">Narrenfahrplan 2027</a></li>
+          <li><a href="./petzen.html" class="footer-link">Petz-Portal (Stories einreichen)</a></li>
+          <li><a href="#fahrplan" class="footer-link">Termin-Export (.ics)</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="footer-col-title">Highlights 2026/2027</h3>
+        <ul class="footer-links">
+          <li><span class="footer-link">11.11. – Fasnetsbeginn</span></li>
+          <li><span class="footer-link">09.01. – Narrenbaumstellen</span></li>
+          <li><span class="footer-link">04.02. – Schmotziger Doschdich</span></li>
+          <li><span class="footer-link">07.02. – Kinderfasnet &amp; Fackelumzug</span></li>
+          <li><span class="footer-link">08.02. – Großer Rosenmontag</span></li>
+          <li><span class="footer-link">09.02. – Großer Jahrmarkt</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <div>&copy; 2027 Elferrat Salmendingen. Alle Rechte vorbehalten.</div>
+      <div>Fasnet Salmendingen • Narri – Narro!</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="./js/confetti.js"></script>
+  <script src="./js/player.js"></script>
+  <script src="./js/fahrplan.js"></script>
+</body>
+</html>

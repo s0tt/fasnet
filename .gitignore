@@ -1,0 +1,17 @@
+# Media & raw production assets (videos, raw recordings, powerpoints, archives)
+media/
+/media/
+
+# Raw binary formats
+*.mp4
+*.wav
+*.zip
+*.pptx
+*.xlsx
+*.docx
+*.psd
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini

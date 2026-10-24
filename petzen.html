@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Petzen – Jessas Jessas heidanei... | Fasnet 2027 Salmendingen</title>
+  <meta name="description" content="Anonyme Geschichten, Pannen und Anekdoten für die Fasnet 2027 in Salmendingen einreichen. Jessas Jessas heidanei, s wird doch nix bassiert sei... oder doch?">
+  
+  <!-- Favicon / Mascot -->
+  <link rel="icon" type="image/png" href="./assets/img/kappe.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/petzen.css">
+</head>
+<body>
+
+  <!-- Sticky Header & Navigation -->
+  <header class="site-header" id="site-header">
+    <div class="container nav-container">
+      <a href="./index.html" class="nav-brand" aria-label="Fasnet 2027 Salmendingen Startseite">
+        <img src="./assets/img/elferrat_logo_web.png" alt="Elferrat Salmendingen Logo" class="nav-brand-logo">
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">Fasnet 2027</span>
+          <span class="nav-brand-sub">Salmendingen</span>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" aria-label="Menü öffnen" id="mobile-toggle">
+        ☰
+      </button>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./index.html" class="nav-link">Narrenfahrplan</a></li>
+        <li>
+          <a href="./petzen.html" class="nav-link nav-btn-petzen active" title="Anonyme Geschichten einreichen">
+            Petzen 🤫
+          </a>
+        </li>
+        <li>
+          <button class="nav-btn-confetti" data-action="confetti" title="Konfetti regnen lassen">
+            🎉 Konfetti!
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main class="petzen-page">
+    <div class="container">
+      
+      <!-- Catchy Swabian Catchphrase Header -->
+      <header class="petzen-header">
+        <div class="petzen-mascot-badge">
+          <img src="./assets/img/kappe.png" alt="Salmendinger Narrenkappe">
+        </div>
+        <h1 class="petzen-headline">
+          „Jessas Jessas heidanei,
+          <span>s wird doch nix bassiert sei... oder doch?“</span>
+        </h1>
+        <p class="petzen-subtext">
+          Ob im Flecka, am Stammtisch, beim Schaffa oder auf dem Fest – hau frei von der Leber weg raus! 
+        </p>
+
+        <!-- Anonymity Trust Shield -->
+        <div class="trust-banner">
+          <span class="trust-icon">🔒</span>
+          <span>100% Anonym • Keine Namenspflicht • Narrenehrenwort</span>
+        </div>
+      </header>
+
+      <!-- Simple Petzen Form Card: One Field, Media Button, Send Button -->
+      <section class="petzen-card">
+        <form id="petzen-form" class="petzen-form-simple">
+          
+          <!-- Only One Field -->
+          <div class="form-group petzen-field-group">
+            <textarea 
+              id="petzen-story" 
+              class="petzen-story-input" 
+              placeholder="Was ist passiert? Wer war beteiligt? Hau frei raus... (100% anonym)"
+              rows="6"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Bottom Action Bar: Media Button & Send Button -->
+          <div class="petzen-action-bar">
+            <!-- Media Button -->
+            <div class="petzen-media-wrapper">
+              <input 
+                type="file" 
+                id="file-input" 
+                class="file-input-hidden" 
+                accept="image/*,video/*,audio/*,.heic,.heif"
+              >
+              <label for="file-input" class="btn-media-picker" id="media-picker-label" title="Foto oder Video auswählen">
+                <span class="media-icon">📷</span>
+                <span id="media-btn-text">Foto / Video hinzufügen</span>
+              </label>
+
+              <!-- Chosen file preview badge -->
+              <div class="file-chosen-pill" id="file-chosen-pill" style="display: none;">
+                <span class="file-chosen-icon">📎</span>
+                <span class="file-chosen-name" id="file-chosen-name"></span>
+                <button type="button" class="file-clear-btn" id="file-remove-btn" title="Datei entfernen">✕</button>
+              </div>
+            </div>
+
+            <!-- Send Button -->
+            <button type="submit" class="btn-petzen-submit" id="btn-submit-petzen">
+              <span class="spinner" id="btn-submit-spinner"></span>
+              <span id="btn-submit-text">Petzen 🤫</span>
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Status & Feedback Container -->
+        <div id="status-message" class="status-message"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Floating Audio Player Bar -->
+  <aside class="audio-player-bar" id="audio-player-bar" aria-label="Fasnetsmusik Player">
+    <audio id="site-audio" preload="auto" playsinline src="./assets/audio/geilste_galaxie.mp3"></audio>
+    <div class="player-cover">
+      <img src="./assets/img/elferrat_mascot.jpg" alt="Album Cover">
+    </div>
+    <div class="player-track-info">
+      <span class="player-track-title" id="player-title">Geilste Galaxie</span>
+      <span class="player-track-artist" id="player-artist">Elferrat Salmendingen</span>
+    </div>
+    <div class="player-controls">
+      <button class="player-btn" id="player-prev-btn" title="Vorheriges Lied" aria-label="Vorheriges Lied">⏮</button>
+      <button class="player-btn player-btn-main" id="player-play-btn" title="Abspielen / Pause" aria-label="Abspielen / Pause">▶</button>
+      <button class="player-btn" id="player-next-btn" title="Nächstes Lied" aria-label="Nächstes Lied">⏭</button>
+    </div>
+    <div class="player-extra-controls">
+      <button class="player-toggle-btn" id="player-minimize-btn" title="Player minimieren" aria-label="Player minimieren">—</button>
+    </div>
+  </aside>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <img src="./assets/img/elferrat_logo_web.png" alt="Elferrat Logo" class="footer-logo">
+          <div class="footer-brand-title">Elferrat Salmendingen</div>
+        </div>
+        <p class="footer-brand-desc">
+          Fasnetstradition, Brauchtumspflege und heitere Geselligkeit auf den Höhen des Kornbühls.
+        </p>
+        <div class="footer-salute">Narri – Narro! 🎭</div>
+      </div>
+
+      <div>
+        <h3 class="footer-col-title">Navigation</h3>
+        <ul class="footer-links">
+          <li><a href="./index.html" class="footer-link">Narrenfahrplan 2027</a></li>
+          <li><a href="./petzen.html" class="footer-link">Petz-Portal (Stories einreichen)</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="footer-col-title">Ehrenwort</h3>
+        <p style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.6;">
+          Alle Einsendungen werden vertraulich vom Elferrat gesichtet und ausschließlich für das 
+          Salmendinger Narrenblatt verwendet. 100% anonym!
+        </p>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <div>&copy; 2027 Elferrat Salmendingen. Alle Rechte vorbehalten.</div>
+      <div>Fasnet Salmendingen • Narri – Narro!</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="./js/confetti.js"></script>
+  <script src="./js/player.js"></script>
+  <script src="./js/petzen.js"></script>
+</body>
+</html>
