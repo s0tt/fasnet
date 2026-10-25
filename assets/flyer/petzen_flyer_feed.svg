@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <!-- Import Google Font Fredoka -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&amp;display=swap');
+      .font-fredoka { font-family: 'Fredoka', 'Outfit', -apple-system, sans-serif; }
+      .cursor-text { cursor: text; }
+    </style>
+
+    <!-- Drop Shadows -->
+    <filter id="badge-shadow" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#042154" flood-opacity="0.35"/>
+    </filter>
+    <filter id="pill-shadow" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+    <filter id="text-shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#042154" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Royal Blue Background -->
+  <rect width="1080" height="1080" fill="#0b50bd"/>
+
+  <!-- Subtle Radial Gradient Highlights -->
+  <radialGradient id="bg-glow" cx="50%" cy="30%" r="50%">
+    <stop offset="0%" stop-color="#1d68dc" stop-opacity="0.5"/>
+    <stop offset="100%" stop-color="#0b50bd" stop-opacity="0"/>
+  </radialGradient>
+  <rect width="1080" height="1080" fill="url(#bg-glow)"/>
+
+  <!-- =========================================================================
+       Carnival Streamers & Confetti
+       ========================================================================= -->
+  <g id="decorations" opacity="0.95">
+    <!-- Streamer 1: Orange Left -->
+    <path d="M 80 -20 C 130 50, 40 100, 110 160 C 170 210, 80 260, 130 310" 
+          fill="none" stroke="#ff8c2b" stroke-width="26" stroke-linecap="round"/>
+    
+    <!-- Streamer 2: White Left-Center -->
+    <path d="M 240 -20 C 180 60, 290 120, 200 190 C 130 250, 260 300, 190 360" 
+          fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+
+    <!-- Streamer 3: Orange Center-Right -->
+    <path d="M 680 -20 C 740 60, 640 130, 720 190 C 780 240, 670 290, 730 350" 
+          fill="none" stroke="#ff8c2b" stroke-width="26" stroke-linecap="round"/>
+
+    <!-- Streamer 4: White Right -->
+    <path d="M 830 -20 C 770 50, 880 110, 800 180 C 740 240, 860 300, 810 360" 
+          fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+
+    <!-- Streamer 5: Pink Far Right -->
+    <path d="M 970 -10 C 920 60, 1010 110, 950 170 C 890 220, 990 280, 930 330" 
+          fill="none" stroke="#ff4081" stroke-width="22" stroke-linecap="round"/>
+
+    <!-- Streamer 6: Pink Far Left -->
+    <path d="M 30 10 C 70 80, 10 130, 50 180 C 90 230, 30 280, 60 320" 
+          fill="none" stroke="#ff4081" stroke-width="20" stroke-linecap="round"/>
+
+    <!-- Confetti Dots -->
+    <circle cx="90" cy="90" r="14" fill="#ff4081"/>
+    <circle cx="160" cy="50" r="12" fill="#00d2ff"/>
+    <circle cx="190" cy="140" r="16" fill="#f2b42c"/>
+    <circle cx="280" cy="80" r="15" fill="#ff8c2b"/>
+    <circle cx="340" cy="150" r="11" fill="#ffffff"/>
+    <circle cx="390" cy="60" r="14" fill="#00d2ff"/>
+    <circle cx="420" cy="120" r="12" fill="#ff4081"/>
+    <circle cx="670" cy="80" r="15" fill="#00d2ff"/>
+    <circle cx="730" cy="130" r="13" fill="#ff4081"/>
+    <circle cx="770" cy="60" r="17" fill="#f2b42c"/>
+    <circle cx="890" cy="70" r="14" fill="#ffffff"/>
+    <circle cx="910" cy="140" r="16" fill="#ff8c2b"/>
+    <circle cx="980" cy="90" r="12" fill="#00d2ff"/>
+    <circle cx="1030" cy="150" r="15" fill="#f2b42c"/>
+    <circle cx="60" cy="220" r="15" fill="#f2b42c"/>
+    <circle cx="1020" cy="250" r="14" fill="#ff4081"/>
+    <circle cx="140" cy="270" r="11" fill="#00d2ff"/>
+    <circle cx="940" cy="290" r="13" fill="#ffffff"/>
+  </g>
+
+  <!-- =========================================================================
+       Narrenkappe (Carnival Cap)
+       ========================================================================= -->
+  <g id="narrenkappe" transform="translate(540, 150)">
+    <image href="../img/kappe.png" x="-110" y="-85" width="220" height="170" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <!-- =========================================================================
+       Headline (Editable Text)
+       ========================================================================= -->
+  <g id="headings">
+    <text x="540" y="320" 
+          text-anchor="middle" 
+          class="font-fredoka cursor-text" 
+          font-size="64" 
+          font-weight="800" 
+          fill="#ffffff" 
+          letter-spacing="0.5"
+          filter="url(#text-shadow)">JESSAS JESSAS HEIDANEI!</text>
+
+    <text x="540" y="380" 
+          text-anchor="middle" 
+          class="font-fredoka cursor-text" 
+          font-size="36" 
+          font-weight="700" 
+          fill="#d5e4ff" 
+          letter-spacing="0.5">S WIRD DOCH NIX BASSIERT SEI...</text>
+  </g>
+
+  <!-- =========================================================================
+       Center Badge: DIE NEUE PETZEBOX (Editable Text)
+       ========================================================================= -->
+  <g id="center-badge" transform="translate(540, 500) rotate(-1.5)">
+    <!-- Yellow Badge Rect -->
+    <rect x="-400" y="-75" width="800" height="150" rx="32" fill="#f2b42c" filter="url(#badge-shadow)"/>
+    
+    <!-- Top line -->
+    <text x="0" y="-12" 
+          text-anchor="middle" 
+          class="font-fredoka cursor-text" 
+          font-size="48" 
+          font-weight="800" 
+          fill="#073887" 
+          letter-spacing="0.5">DIE NEUE PETZEBOX 🤫</text>
+
+    <!-- Bottom line -->
+    <text x="0" y="46" 
+          text-anchor="middle" 
+          class="font-fredoka cursor-text" 
+          font-size="44" 
+          font-weight="800" 
+          fill="#042154" 
+          letter-spacing="1">100% ANONYM</text>
+  </g>
+
+  <!-- =========================================================================
+       Feature Highlight: Sprachnachricht (Editable Text)
+       ========================================================================= -->
+  <g id="feature-highlight">
+    <text x="540" y="660" 
+          text-anchor="middle" 
+          class="font-fredoka cursor-text" 
+          font-size="40" 
+          font-weight="700" 
+          fill="#ffffff"
+          filter="url(#text-shadow)">NEU: AUCH PER SPRACHNACHRICHT 🎙️</text>
+  </g>
+
+  <!-- =========================================================================
+       URL Call-To-Action Pill: fasnet.fun/petzen (Editable Text)
+       ========================================================================= -->
+  <g id="url-cta" transform="translate(540, 775)">
+    <!-- White Pill Button -->
+    <rect x="-350" y="-52" width="700" height="104" rx="52" fill="#ffffff" filter="url(#pill-shadow)"/>
+    
+    <!-- Link Text -->
+    <text x="0" y="16" 
+          text-anchor="middle" 
+          class="font-fredoka cursor-text" 
+          font-size="52" 
+          font-weight="800" 
+          fill="#d9242a" 
+          letter-spacing="0.5">fasnet.fun/petzen</text>
+  </g>
+
+  <!-- =========================================================================
+       Bottom Badges: Elferrat Logo (Left) & Narrenehrenwort Seal (Right)
+       ========================================================================= -->
+  <g id="bottom-bar">
+    <!-- Elferrat Logo Left -->
+    <g transform="translate(70, 890)">
+      <image href="../img/elferrat_logo_web.png" x="0" y="0" width="140" height="140" preserveAspectRatio="xMidYMid meet"/>
+    </g>
+
+    <!-- Narrenehrenwort Sticker Right -->
+    <g transform="translate(950, 960) rotate(4)">
+      <circle cx="0" cy="0" r="90" fill="#f2b42c" filter="url(#badge-shadow)"/>
+      <text x="0" y="-12" 
+            text-anchor="middle" 
+            class="font-fredoka cursor-text" 
+            font-size="25" 
+            font-weight="800" 
+            fill="#073887">Narrenehren-</text>
+      <text x="0" y="20" 
+            text-anchor="middle" 
+            class="font-fredoka cursor-text" 
+            font-size="25" 
+            font-weight="800" 
+            fill="#073887">wort! 🎭</text>
+      <text x="0" y="50" 
+            text-anchor="middle" 
+            class="font-fredoka cursor-text" 
+            font-size="16" 
+            font-weight="700" 
+            fill="#b8171d">100% Sicher</text>
+    </g>
+  </g>
+</svg>

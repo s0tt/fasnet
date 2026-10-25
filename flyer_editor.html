@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flyer Editor – Fasnet 2027 Salmendingen</title>
+  <link rel="icon" type="image/png" href="./assets/img/kappe.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-primary: #0b50bd;
+      --color-primary-dark: #073887;
+      --color-accent: #f2b42c;
+      --color-red: #d9242a;
+      --color-bg: #0f172a;
+      --color-surface: #1e293b;
+      --color-border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--color-bg);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top App Header */
+    .editor-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .editor-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .editor-brand img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+
+    .editor-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .editor-title span {
+      color: var(--color-accent);
+      font-size: 0.9rem;
+      display: block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+    }
+
+    /* Format Switcher Tabs */
+    .format-tabs {
+      display: flex;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      gap: 4px;
+    }
+
+    .format-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .format-btn:hover {
+      color: #ffffff;
+    }
+
+    .format-btn.active {
+      background: var(--color-primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(11, 80, 189, 0.4);
+    }
+
+    /* Action Buttons */
+    .editor-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .btn-export-png {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-export-png:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-export-svg {
+      background: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-export-svg:hover {
+      background: #475569;
+      color: #ffffff;
+    }
+
+    .btn-reset {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .btn-reset:hover {
+      color: #f87171;
+    }
+
+    /* Main Workspace */
+    .editor-workspace {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.5rem;
+      background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+      overflow: auto;
+    }
+
+    .flyer-stage {
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(11, 80, 189, 0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b50bd;
+      transition: all 0.3s ease;
+    }
+
+    /* Feed dimensions preview */
+    .flyer-stage.format-feed {
+      width: 580px;
+      height: 580px;
+    }
+
+    /* Story dimensions preview */
+    .flyer-stage.format-story {
+      width: 440px;
+      height: 782px; /* 9:16 aspect */
+    }
+
+    @media (max-width: 650px) {
+      .flyer-stage.format-feed {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+      }
+      .flyer-stage.format-story {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 9 / 16;
+      }
+    }
+
+    .flyer-stage svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Editable Text Hover Feedback */
+    .flyer-stage text {
+      outline: none;
+      transition: opacity 0.15s;
+    }
+
+    .flyer-stage text:hover {
+      cursor: text;
+      fill-opacity: 0.9;
+    }
+
+    .flyer-stage text:focus {
+      outline: 2px dashed #f2b42c;
+    }
+
+    /* Helper Banner */
+    .editor-hint-banner {
+      background: rgba(15, 23, 42, 0.85);
+      border-top: 1px solid var(--color-border);
+      padding: 0.75rem 1.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    .editor-hint-banner strong {
+      color: var(--color-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation & Controls -->
+  <header class="editor-header">
+    <a href="./petzen.html" class="editor-brand">
+      <img src="./assets/img/kappe.png" alt="Narrenkappe">
+      <div class="editor-title">
+        Flyer Editor 🎨
+        <span>Fasnet 2027 Salmendingen</span>
+      </div>
+    </a>
+
+    <!-- Format Tabs -->
+    <div class="format-tabs">
+      <button class="format-btn active" id="tab-feed" onclick="switchFormat('feed')">
+        📷 Feed (1:1)
+      </button>
+      <button class="format-btn" id="tab-story" onclick="switchFormat('story')">
+        📱 Story (9:16)
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="editor-actions">
+      <button type="button" class="btn-export-png" id="btn-export-png" onclick="exportFlyer('png')">
+        📥 Als PNG herunterladen
+      </button>
+      <button type="button" class="btn-export-svg" onclick="exportFlyer('svg')">
+        📄 SVG speichern
+      </button>
+      <button type="button" class="btn-reset" onclick="resetFlyerText()">
+        Zurücksetzen
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Canvas -->
+  <main class="editor-workspace">
+    <div class="flyer-stage format-feed" id="flyer-stage">
+      <!-- Embedded Interactive SVG Container -->
+      <div id="svg-container" style="width: 100%; height: 100%;"></div>
+    </div>
+  </main>
+
+  <!-- Helper Note -->
+  <div class="editor-hint-banner">
+    💡 <strong>Live-Editor:</strong> Klicke direkt auf die Texte (Überschrift, Petzebox, Link), um sie frei anzupassen. Klicke anschließend oben auf <strong>„Als PNG herunterladen“</strong>.
+  </div>
+
+  <!-- Offscreen Canvas for Rendering High-Res PNG -->
+  <canvas id="offscreen-canvas" style="display: none;"></canvas>
+
+  <script>
+    var currentFormat = 'feed';
+
+    // SVG Templates with editable text tags
+    var feedSvgTemplate = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080" width="1080" height="1080" id="current-svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&amp;display=swap');
+      .font-fredoka { font-family: 'Fredoka', 'Outfit', sans-serif; }
+    </style>
+    <filter id="badge-shadow" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#042154" flood-opacity="0.35"/>
+    </filter>
+    <filter id="pill-shadow" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+    <filter id="text-shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#042154" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#0b50bd"/>
+
+  <!-- Confetti & Streamers -->
+  <g opacity="0.95">
+    <path d="M 80 -20 C 130 50, 40 100, 110 160 C 170 210, 80 260, 130 310" fill="none" stroke="#ff8c2b" stroke-width="26" stroke-linecap="round"/>
+    <path d="M 240 -20 C 180 60, 290 120, 200 190 C 130 250, 260 300, 190 360" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+    <path d="M 680 -20 C 740 60, 640 130, 720 190 C 780 240, 670 290, 730 350" fill="none" stroke="#ff8c2b" stroke-width="26" stroke-linecap="round"/>
+    <path d="M 830 -20 C 770 50, 880 110, 800 180 C 740 240, 860 300, 810 360" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round"/>
+    <path d="M 970 -10 C 920 60, 1010 110, 950 170 C 890 220, 990 280, 930 330" fill="none" stroke="#ff4081" stroke-width="22" stroke-linecap="round"/>
+    <path d="M 30 10 C 70 80, 10 130, 50 180 C 90 230, 30 280, 60 320" fill="none" stroke="#ff4081" stroke-width="20" stroke-linecap="round"/>
+
+    <circle cx="90" cy="90" r="14" fill="#ff4081"/>
+    <circle cx="160" cy="50" r="12" fill="#00d2ff"/>
+    <circle cx="190" cy="140" r="16" fill="#f2b42c"/>
+    <circle cx="280" cy="80" r="15" fill="#ff8c2b"/>
+    <circle cx="340" cy="150" r="11" fill="#ffffff"/>
+    <circle cx="390" cy="60" r="14" fill="#00d2ff"/>
+    <circle cx="670" cy="80" r="15" fill="#00d2ff"/>
+    <circle cx="730" cy="130" r="13" fill="#ff4081"/>
+    <circle cx="770" cy="60" r="17" fill="#f2b42c"/>
+    <circle cx="890" cy="70" r="14" fill="#ffffff"/>
+    <circle cx="910" cy="140" r="16" fill="#ff8c2b"/>
+    <circle cx="980" cy="90" r="12" fill="#00d2ff"/>
+    <circle cx="1030" cy="150" r="15" fill="#f2b42c"/>
+    <circle cx="60" cy="220" r="15" fill="#f2b42c"/>
+    <circle cx="1020" cy="250" r="14" fill="#ff4081"/>
+  </g>
+
+  <!-- Narrenkappe -->
+  <g transform="translate(540, 150)">
+    <image href="./assets/img/kappe.png" x="-110" y="-85" width="220" height="170" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <!-- Headline -->
+  <text id="txt-headline-1" x="540" y="320" text-anchor="middle" class="font-fredoka" font-size="64" font-weight="800" fill="#ffffff" filter="url(#text-shadow)">JESSAS JESSAS HEIDANEI!</text>
+  <text id="txt-headline-2" x="540" y="380" text-anchor="middle" class="font-fredoka" font-size="36" font-weight="700" fill="#d5e4ff">S WIRD DOCH NIX BASSIERT SEI...</text>
+
+  <!-- Center Badge -->
+  <g transform="translate(540, 500) rotate(-1.5)">
+    <rect x="-400" y="-75" width="800" height="150" rx="32" fill="#f2b42c" filter="url(#badge-shadow)"/>
+    <text id="txt-badge-1" x="0" y="-12" text-anchor="middle" class="font-fredoka" font-size="48" font-weight="800" fill="#073887">DIE NEUE PETZEBOX 🤫</text>
+    <text id="txt-badge-2" x="0" y="46" text-anchor="middle" class="font-fredoka" font-size="44" font-weight="800" fill="#042154">100% ANONYM</text>
+  </g>
+
+  <!-- Feature Voice -->
+  <text id="txt-feature" x="540" y="660" text-anchor="middle" class="font-fredoka" font-size="40" font-weight="700" fill="#ffffff" filter="url(#text-shadow)">NEU: AUCH PER SPRACHNACHRICHT 🎙️</text>
+
+  <!-- Link Button -->
+  <g transform="translate(540, 775)">
+    <rect x="-350" y="-52" width="700" height="104" rx="52" fill="#ffffff" filter="url(#pill-shadow)"/>
+    <text id="txt-link" x="0" y="16" text-anchor="middle" class="font-fredoka" font-size="52" font-weight="800" fill="#d9242a">fasnet.fun/petzen</text>
+  </g>
+
+  <!-- Seals -->
+  <g transform="translate(70, 890)">
+    <image href="./assets/img/elferrat_logo_web.png" x="0" y="0" width="140" height="140" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+  <g transform="translate(950, 960) rotate(4)">
+    <circle cx="0" cy="0" r="90" fill="#f2b42c" filter="url(#badge-shadow)"/>
+    <text id="txt-seal-1" x="0" y="-12" text-anchor="middle" class="font-fredoka" font-size="25" font-weight="800" fill="#073887">Narrenehren-</text>
+    <text id="txt-seal-2" x="0" y="20" text-anchor="middle" class="font-fredoka" font-size="25" font-weight="800" fill="#073887">wort! 🎭</text>
+    <text id="txt-seal-3" x="0" y="50" text-anchor="middle" class="font-fredoka" font-size="16" font-weight="700" fill="#b8171d">100% Sicher</text>
+  </g>
+</svg>`;
+
+    var storySvgTemplate = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1920" width="1080" height="1920" id="current-svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&amp;display=swap');
+      .font-fredoka { font-family: 'Fredoka', 'Outfit', sans-serif; }
+    </style>
+    <filter id="badge-shadow" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#042154" flood-opacity="0.4"/>
+    </filter>
+    <filter id="pill-shadow" x="-10%" y="-10%" width="125%" height="135%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    <filter id="text-shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#042154" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1920" fill="#0b50bd"/>
+
+  <!-- Confetti & Streamers -->
+  <g opacity="0.95">
+    <path d="M 80 -20 C 140 100, 30 200, 130 300 C 200 390, 80 470, 140 560" fill="none" stroke="#ff8c2b" stroke-width="32" stroke-linecap="round"/>
+    <path d="M 260 -20 C 190 110, 320 220, 210 330 C 130 420, 280 500, 200 600" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <path d="M 700 -20 C 780 100, 650 210, 750 310 C 830 400, 680 490, 760 580" fill="none" stroke="#ff8c2b" stroke-width="32" stroke-linecap="round"/>
+    <path d="M 870 -20 C 790 90, 930 190, 830 290 C 760 380, 900 480, 830 580" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <path d="M 990 -10 C 930 100, 1030 200, 960 290 C 890 380, 1010 470, 940 560" fill="none" stroke="#ff4081" stroke-width="26" stroke-linecap="round"/>
+
+    <circle cx="90" cy="140" r="18" fill="#ff4081"/>
+    <circle cx="170" cy="90" r="15" fill="#00d2ff"/>
+    <circle cx="210" cy="220" r="22" fill="#f2b42c"/>
+    <circle cx="310" cy="120" r="20" fill="#ff8c2b"/>
+    <circle cx="370" cy="240" r="16" fill="#ffffff"/>
+    <circle cx="650" cy="130" r="20" fill="#00d2ff"/>
+    <circle cx="720" cy="210" r="17" fill="#ff4081"/>
+    <circle cx="790" cy="100" r="24" fill="#f2b42c"/>
+    <circle cx="920" cy="110" r="18" fill="#ffffff"/>
+    <circle cx="950" cy="220" r="22" fill="#ff8c2b"/>
+  </g>
+
+  <!-- Narrenkappe -->
+  <g transform="translate(540, 280)">
+    <image href="./assets/img/kappe.png" x="-150" y="-115" width="300" height="230" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+
+  <!-- Headline -->
+  <text id="txt-headline-1" x="540" y="520" text-anchor="middle" class="font-fredoka" font-size="76" font-weight="800" fill="#ffffff" filter="url(#text-shadow)">JESSAS JESSAS HEIDANEI!</text>
+  <text id="txt-headline-2" x="540" y="600" text-anchor="middle" class="font-fredoka" font-size="44" font-weight="700" fill="#d5e4ff">S WIRD DOCH NIX BASSIERT SEI...</text>
+
+  <!-- Center Badge -->
+  <g transform="translate(540, 800) rotate(-1.5)">
+    <rect x="-440" y="-95" width="880" height="190" rx="36" fill="#f2b42c" filter="url(#badge-shadow)"/>
+    <text id="txt-badge-1" x="0" y="-15" text-anchor="middle" class="font-fredoka" font-size="58" font-weight="800" fill="#073887">DIE NEUE PETZEBOX 🤫</text>
+    <text id="txt-badge-2" x="0" y="55" text-anchor="middle" class="font-fredoka" font-size="52" font-weight="800" fill="#042154">100% ANONYM</text>
+  </g>
+
+  <!-- Feature Voice -->
+  <text id="txt-feature" x="540" y="1030" text-anchor="middle" class="font-fredoka" font-size="46" font-weight="700" fill="#ffffff" filter="url(#text-shadow)">NEU: AUCH PER SPRACHNACHRICHT 🎙️</text>
+  <text id="txt-feature-sub" x="540" y="1100" text-anchor="middle" class="font-fredoka" font-size="36" font-weight="600" fill="#d5e4ff">Einfach einsprechen oder abtippen!</text>
+
+  <!-- Link Button -->
+  <g transform="translate(540, 1260)">
+    <rect x="-400" y="-60" width="800" height="120" rx="60" fill="#ffffff" filter="url(#pill-shadow)"/>
+    <text id="txt-link" x="0" y="18" text-anchor="middle" class="font-fredoka" font-size="58" font-weight="800" fill="#d9242a">fasnet.fun/petzen</text>
+  </g>
+
+  <!-- Seals -->
+  <g transform="translate(80, 1680)">
+    <image href="./assets/img/elferrat_logo_web.png" x="0" y="0" width="180" height="180" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+  <g transform="translate(930, 1750) rotate(4)">
+    <circle cx="0" cy="0" r="110" fill="#f2b42c" filter="url(#badge-shadow)"/>
+    <text id="txt-seal-1" x="0" y="-15" text-anchor="middle" class="font-fredoka" font-size="30" font-weight="800" fill="#073887">Narrenehren-</text>
+    <text id="txt-seal-2" x="0" y="24" text-anchor="middle" class="font-fredoka" font-size="30" font-weight="800" fill="#073887">wort! 🎭</text>
+    <text id="txt-seal-3" x="0" y="60" text-anchor="middle" class="font-fredoka" font-size="19" font-weight="700" fill="#b8171d">100% Sicher</text>
+  </g>
+</svg>`;
+
+    function renderSvg() {
+      var container = document.getElementById('svg-container');
+      container.innerHTML = (currentFormat === 'feed') ? feedSvgTemplate : storySvgTemplate;
+
+      // Enable inline click-to-edit on all text elements
+      var texts = container.querySelectorAll('text');
+      texts.forEach(function (t) {
+        t.setAttribute('tabindex', '0');
+        t.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var currentVal = t.textContent;
+          var newVal = prompt('Text bearbeiten:', currentVal);
+          if (newVal !== null && newVal.trim() !== '') {
+            t.textContent = newVal;
+          }
+        });
+      });
+    }
+
+    function switchFormat(format) {
+      currentFormat = format;
+      var stage = document.getElementById('flyer-stage');
+      var tabFeed = document.getElementById('tab-feed');
+      var tabStory = document.getElementById('tab-story');
+
+      if (format === 'feed') {
+        stage.className = 'flyer-stage format-feed';
+        tabFeed.classList.add('active');
+        tabStory.classList.remove('active');
+      } else {
+        stage.className = 'flyer-stage format-story';
+        tabStory.classList.add('active');
+        tabFeed.classList.remove('active');
+      }
+
+      renderSvg();
+    }
+
+    function resetFlyerText() {
+      renderSvg();
+    }
+
+    function exportFlyer(type) {
+      var svgElement = document.getElementById('current-svg');
+      if (!svgElement) return;
+
+      var serializer = new XMLSerializer();
+      var svgString = serializer.serializeToString(svgElement);
+
+      if (type === 'svg') {
+        var blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'petzen_flyer_' + currentFormat + '.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        return;
+      }
+
+      if (type === 'png') {
+        var exportBtn = document.getElementById('btn-export-png');
+        if (exportBtn) exportBtn.textContent = '⏳ Wird generiert...';
+
+        var width = (currentFormat === 'feed') ? 1080 : 1080;
+        var height = (currentFormat === 'feed') ? 1080 : 1920;
+
+        var canvas = document.getElementById('offscreen-canvas');
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+
+        var img = new Image();
+        var svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        var url = URL.createObjectURL(svgBlob);
+
+        img.onload = function () {
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+
+          var pngUrl = canvas.toDataURL('image/png');
+          var a = document.createElement('a');
+          a.href = pngUrl;
+          a.download = 'petzen_flyer_' + currentFormat + '.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          if (exportBtn) exportBtn.textContent = '📥 Als PNG herunterladen';
+        };
+
+        img.onerror = function (e) {
+          console.error('PNG Export error:', e);
+          alert('Export als PNG fehlgeschlagen. Du kannst den Flyer auch als SVG herunterladen!');
+          if (exportBtn) exportBtn.textContent = '📥 Als PNG herunterladen';
+        };
+
+        img.src = url;
+      }
+    }
+
+    // Initial render
+    renderSvg();
+  </script>
+</body>
+</html>
