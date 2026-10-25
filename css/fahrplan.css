@@ -409,39 +409,13 @@
   50% { transform: scale(1.15) rotate(8deg); }
 }
 
-.tbd-overlay-pill {
-  display: inline-block;
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: #f59e0b;
-  color: #ffffff;
-  padding: 0.28rem 0.9rem;
-  border-radius: var(--radius-full);
-  margin-bottom: 0.85rem;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
-}
-
 .tbd-overlay-title {
   font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 800;
   color: #92400e;
-  margin-bottom: 0.75rem;
-  line-height: 1.25;
-}
-
-.tbd-overlay-text {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #78350f;
   margin-bottom: 1.5rem;
-}
-
-.tbd-overlay-text strong {
-  color: #451a03;
+  line-height: 1.25;
 }
 
 .tbd-overlay-actions {
@@ -490,10 +464,6 @@
 
   .tbd-overlay-title {
     font-size: 1.25rem;
-  }
-
-  .tbd-overlay-text {
-    font-size: 0.88rem;
   }
 }
 

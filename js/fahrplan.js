@@ -197,11 +197,7 @@
       ? '<ul class="event-sub-points">' + ev.subPoints.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul>'
       : '';
 
-    var badgeTagHtml = isConfirmed
-      ? '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>' +
-        '<span class="badge-tag badge-confirmed">✅ Geplant &amp; Fest</span>'
-      : '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>' +
-        '<span class="badge-tag badge-tbd">⏳ In Planung • TBD</span>';
+    var badgeTagHtml = '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>';
 
     var actionHtml = isConfirmed
       ? '<div class="event-actions">' +
@@ -268,14 +264,9 @@
       html += '  <div class="tbd-overlay" aria-hidden="false">';
       html += '    <div class="tbd-overlay-card">';
       html += '      <div class="tbd-overlay-icon-wrap"><span class="tbd-overlay-icon">⏳</span></div>';
-      html += '      <span class="tbd-overlay-pill">In Abstimmung • TBD</span>';
-      html += '      <h3 class="tbd-overlay-title">Fahrplan 2027 noch in Vorbereitung</h3>';
-      html += '      <p class="tbd-overlay-text">';
-      html += '        Der offizielle Narrenfahrplan für die Fasnet 2027 wird aktuell vom Elferrat final ausgearbeitet.<br>';
-      html += '        Bis auf den <strong>Fasnetsbeginn (11.11.)</strong> sind alle weiteren Termine noch vorläufig!';
-      html += '      </p>';
+      html += '      <h3 class="tbd-overlay-title">Fahrplan 2027 in Abstimmung (TBD)</h3>';
       html += '      <div class="tbd-overlay-actions">';
-      html += '        <a href="./petzen.html" class="btn btn-petzen tbd-cta-btn">🤫 Jetzt Dorfgeheimnis petzen</a>';
+      html += '        <a href="./petzen.html" class="btn btn-petzen tbd-cta-btn">🤫 Geschichte fürs Narrenblatt petzen</a>';
       html += '      </div>';
       html += '    </div>';
       html += '  </div>';
