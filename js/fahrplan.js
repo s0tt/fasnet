@@ -399,6 +399,12 @@
     exportSingle: function (eventId) {
       var ev = events.find(function (e) { return e.id === eventId; });
       if (!ev) return;
+      if (typeof gtag === 'function') {
+        gtag('event', 'calendar_export', {
+          event_category: 'Fahrplan',
+          event_label: ev.title
+        });
+      }
       var ics = generateICSContent([ev]);
       downloadFile(ev.id + '_salmendingen_2027.ics', ics);
     },

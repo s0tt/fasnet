@@ -742,6 +742,12 @@
         setTimeout(function () { window.confetti.burst(); }, 300);
       }
 
+      if (typeof gtag === 'function') {
+        gtag('event', 'petzen_story_submitted', {
+          event_category: 'Petzen'
+        });
+      }
+
       form.style.display = 'none';
 
       if (statusMessage) {
