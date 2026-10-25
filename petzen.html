@@ -264,7 +264,17 @@
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <!-- Scripts & Configuration -->
+  <script src="./js/config.js"></script>
+  <script>
+    // Dynamically load local dev configuration if present (git-ignored)
+    (function () {
+      var s = document.createElement('script');
+      s.src = './js/config.local.js';
+      s.async = false;
+      document.head.appendChild(s);
+    })();
+  </script>
   <script src="./js/confetti.js"></script>
   <script src="./js/player.js"></script>
   <script src="./js/petzen.js"></script>

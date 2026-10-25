@@ -15,3 +15,11 @@ media/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Secrets, API Keys & Local Developer Configurations (DO NOT COMMIT)
+secrets/
+/secrets/
+js/config.local.js
+*.local.js
+.env
+.env.*

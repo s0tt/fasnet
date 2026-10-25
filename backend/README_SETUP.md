@@ -33,14 +33,18 @@ Mit dieser Anleitung richtest du das kostenlose Backend für das **Petz-Portal**
 
 ---
 
-## Schritt 4: Web-App-URL in deine Website einfügen
-1. Kopiere die generierte **Web-App-URL** (beginnt mit `https://script.google.com/macros/s/.../exec`).
-2. Öffne in diesem Projekt die Datei [`js/petzen.js`](../js/petzen.js).
-3. Trage deine URL ganz oben in Zeile 13 ein:
-   ```javascript
-   var GOOGLE_SCRIPT_WEBAPP_URL = "DEINE_KOPIERTE_URL_HIER";
-   ```
-4. Speichern und auf GitHub pushen. Fertig! 🎉
+## Schritt 4: Secrets sicher in GitHub hinterlegen (Public Repo Schutz)
+Da dein GitHub-Repository öffentlich ist, werden **keine Schlüssel im Quellcode committed**. Stattdessen nutzt das Projekt GitHub Repository Secrets und GitHub Actions für das Deployment:
+
+1. Gehe in deinem GitHub-Repository auf **Settings** > **Secrets and variables** > **Actions**.
+2. Klicke auf **New repository secret** und lege folgende Secrets an:
+   - **`GOOGLE_SCRIPT_WEBAPP_URL`**: Deine kopierte Web-App-URL (`https://script.google.com/macros/s/.../exec`)
+   - **`DEEPGRAM_API_KEY`**: Dein Deepgram API-Key für die KI-Spracherkennung
+3. Klicke unter **Settings** > **Pages** bei **Source** auf **GitHub Actions**.
+4. Sobald du auf `main` pushst, injiziert der GitHub Actions Workflow (`.github/workflows/deploy.yml`) die Secrets beim Deployment automatisch in die Website – **ohne dass sie jemals im Git-Verlauf oder Repo-Code sichtbar sind!** 🎉
+
+> **Für lokale Entwicklung auf deinem PC:**
+> Trage die Keys einfach in die Datei [`js/config.local.js`](../js/config.local.js) ein. Diese Datei ist in `.gitignore` eingetragen und wird niemals auf GitHub hochgeladen.
 
 ---
 

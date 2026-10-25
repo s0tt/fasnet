@@ -1,14 +1,36 @@
 /**
  * Fasnet 2027 Salmendingen – Petzen Script
- * Handles story submission, live Speech-to-Text transcription,
- * voice note recording (MediaRecorder) with Google Drive fallback, and media uploads.
+ * Powered by Deepgram Nova-2 AI Speech-to-Text & Google Drive Voice Notes
+ * Zero secrets committed: Reads from GitHub Secrets / config.js / config.local.js
  */
 
 (function () {
   'use strict';
 
-  // Nach Bereitstellung des Google Apps Scripts die Web-App-URL hier einfügen:
-  var GOOGLE_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxELTGl4SyNp4_lL8nh8qtUqb_johcHz5F8Iv8H_SHivRJpbfj2lSJE7iXi9J1mFSziyg/exec";
+  // =========================================================================
+  // Safe Configuration Loader (Reads GitHub Secrets or Local Dev Config)
+  // =========================================================================
+  function getConfig(key) {
+    // 1. Check local development config (loaded from git-ignored config.local.js)
+    if (window.FASNET_LOCAL_CONFIG && window.FASNET_LOCAL_CONFIG[key]) {
+      return window.FASNET_LOCAL_CONFIG[key];
+    }
+    // 2. Check injected config from GitHub Actions / config.js
+    if (window.FASNET_CONFIG && window.FASNET_CONFIG[key]) {
+      var val = window.FASNET_CONFIG[key];
+      // Only return if it's not an unreplaced placeholder like '__KEY__'
+      if (!val.startsWith('__')) {
+        return val;
+      }
+    }
+    // 3. Check developer override in localStorage
+    try {
+      var stored = localStorage.getItem('fasnet_' + key.toLowerCase());
+      if (stored) return stored;
+    } catch (e) {}
+
+    return '';
+  }
 
   var attachedFile = null;
   var attachedBase64 = null;
@@ -20,14 +42,15 @@
   var mediaStream = null;
   var mediaRecorder = null;
   var recordedChunks = [];
-  var speechRecognition = null;
   var isRecording = false;
   var recordingTimerInterval = null;
   var recordingSeconds = 0;
-  var recognizedFinal = '';
   var preExistingText = '';
-  var recognitionErrorOccurred = false;
   var wasAudioPlaying = false;
+
+  // Live browser assistant stream (visual feedback while recording)
+  var liveRecognition = null;
+  var liveInterimText = '';
 
   function initPetzen() {
     var form = document.getElementById('petzen-form');
@@ -157,7 +180,48 @@
     }
 
     // =========================================================================
-    // Voice Recording & Speech-to-Text Logic
+    // Deepgram Speech-to-Text API Service
+    // =========================================================================
+    function transcribeWithDeepgram(audioBlob) {
+      var apiKey = getConfig('DEEPGRAM_API_KEY');
+      if (!apiKey) {
+        console.info('Deepgram API-Key nicht hinterlegt. Nutze automatischen Fallback zu Google Drive Sprachnachricht.');
+        return Promise.reject(new Error('MISSING_API_KEY'));
+      }
+
+      // Deepgram REST API for high-accuracy German audio transcription
+      var endpoint = 'https://api.deepgram.com/v1/listen?model=nova-2&language=de&smart_format=true&punctuate=true';
+
+      return fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Token ' + apiKey,
+          'Content-Type': audioBlob.type || 'audio/webm'
+        },
+        body: audioBlob
+      })
+      .then(function (response) {
+        if (!response.ok) {
+          return response.text().then(function (errText) {
+            throw new Error('Deepgram API Fehler (' + response.status + '): ' + errText);
+          });
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        var alternatives = data.results && data.results.channels && data.results.channels[0] && data.results.channels[0].alternatives;
+        if (alternatives && alternatives.length > 0) {
+          return {
+            transcript: alternatives[0].transcript || '',
+            confidence: alternatives[0].confidence !== undefined ? alternatives[0].confidence : 1.0
+          };
+        }
+        return { transcript: '', confidence: 0 };
+      });
+    }
+
+    // =========================================================================
+    // Voice Recording & Speech-to-Text Management
     // =========================================================================
     function updateTimerDisplay() {
       if (recordingTimer) {
@@ -190,8 +254,7 @@
           mediaStream = stream;
           isRecording = true;
           recordedChunks = [];
-          recognizedFinal = '';
-          recognitionErrorOccurred = false;
+          liveInterimText = '';
           recordingSeconds = 0;
           preExistingText = storyInput ? storyInput.value.trim() : '';
 
@@ -213,7 +276,7 @@
             updateTimerDisplay();
           }, 1000);
 
-          // Setup MediaRecorder for capturing audio (fallback or drive storage)
+          // Setup MediaRecorder
           var mimeInfo = getSupportedMimeType();
           try {
             mediaRecorder = mimeInfo.mime ? new MediaRecorder(stream, { mimeType: mimeInfo.mime }) : new MediaRecorder(stream);
@@ -229,73 +292,40 @@
 
           mediaRecorder.start(250);
 
-          // Setup SpeechRecognition (Web Speech API)
+          // Live visual transcription hint
+          if (voiceLiveHint) {
+            voiceLiveHint.textContent = '🎙️ Höre zu... Sprich frei drauflos! (Wird mit Deepgram KI in Text umgewandelt)';
+          }
+
+          // Optional: Live browser speech recognition for real-time visual feedback while recording
           var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
           if (SpeechRec) {
             try {
-              speechRecognition = new SpeechRec();
-              speechRecognition.lang = 'de-DE';
-              speechRecognition.continuous = true;
-              speechRecognition.interimResults = true;
-              speechRecognition.maxAlternatives = 1;
-
-              speechRecognition.onstart = function () {
-                if (voiceLiveHint) {
-                  voiceLiveHint.textContent = '🎙️ Höre zu... Sprich frei drauflos! (Wird live in Text umgewandelt)';
+              liveRecognition = new SpeechRec();
+              liveRecognition.lang = 'de-DE';
+              liveRecognition.continuous = true;
+              liveRecognition.interimResults = true;
+              liveRecognition.onresult = function (evt) {
+                var interim = '';
+                for (var i = evt.resultIndex; i < evt.results.length; ++i) {
+                  interim += evt.results[i][0].transcript;
+                }
+                liveInterimText = interim;
+                if (storyInput && isRecording) {
+                  var liveDisplay = (preExistingText ? preExistingText + ' ' : '') + liveInterimText;
+                  storyInput.value = liveDisplay.trim();
                 }
               };
-
-              speechRecognition.onresult = function (event) {
-                var interimTranscript = '';
-                for (var i = event.resultIndex; i < event.results.length; ++i) {
-                  var piece = event.results[i][0].transcript;
-                  if (event.results[i].isFinal) {
-                    recognizedFinal += piece + ' ';
-                  } else {
-                    interimTranscript += piece;
-                  }
-                }
-
-                var fullOutput = (preExistingText ? preExistingText + ' ' : '') + recognizedFinal + interimTranscript;
-                if (storyInput) {
-                  storyInput.value = fullOutput.trim();
-                }
-              };
-
-              speechRecognition.onerror = function (event) {
-                console.warn('Speech recognition warning:', event.error);
-                if (event.error !== 'no-speech') {
-                  recognitionErrorOccurred = true;
-                }
-              };
-
-              speechRecognition.onend = function () {
-                // If user is still recording, resume recognition if browser stopped on pause
-                if (isRecording && speechRecognition) {
-                  try {
-                    speechRecognition.start();
-                  } catch (e) {}
-                }
-              };
-
-              speechRecognition.start();
+              liveRecognition.start();
             } catch (srErr) {
-              console.warn('Speech recognition could not start:', srErr);
-              speechRecognition = null;
-              if (voiceLiveHint) {
-                voiceLiveHint.textContent = '🎙️ Sprachnachricht wird aufgezeichnet (wird direkt an dein Google Drive gesendet)...';
-              }
-            }
-          } else {
-            if (voiceLiveHint) {
-              voiceLiveHint.textContent = '🎙️ Sprachnachricht wird aufgezeichnet (Audiodatei für Google Drive)...';
+              liveRecognition = null;
             }
           }
         })
         .catch(function (err) {
           console.error('Microphone access failed:', err);
           if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-            alert('Mikrofon-Zugriff wurde verweigert. Bitte erlaube den Mikrofonzugriff in deinen Browsereinstellungen.');
+            alert('Mikrofon-Zugriff wurde verweigert. Bitte erlaube das Mikrofon in deinen Browsereinstellungen.');
           } else {
             alert('Mikrofon konnte nicht aktiviert werden: ' + (err.message || err.name));
           }
@@ -320,15 +350,13 @@
         voiceRecordingPanel.style.display = 'none';
       }
 
-      // Stop speech recognition
-      if (speechRecognition) {
-        speechRecognition.onend = null;
-        try {
-          speechRecognition.stop();
-        } catch (e) {}
+      // Stop live recognition
+      if (liveRecognition) {
+        try { liveRecognition.stop(); } catch (e) {}
+        liveRecognition = null;
       }
 
-      // Stop MediaRecorder
+      // Stop MediaRecorder and trigger Deepgram processing
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.onstop = function () {
           if (!canceled) {
@@ -377,7 +405,7 @@
         voiceFile = voiceBlob;
       }
 
-      // Prepare audio playback element
+      // Prepare audio playback preview
       if (voiceAudioUrl) {
         URL.revokeObjectURL(voiceAudioUrl);
       }
@@ -390,69 +418,103 @@
         playbackTime.textContent = formatTime(recordingSeconds);
       }
 
-      // =========================================================================
-      // Decision Logic: Confidence in parsing Speech to Text vs. Google Drive Audio
-      // "if you are confident you can parse the speech to text before sending. Else one can just send the voice note to my google drive."
-      // =========================================================================
-      var hasWebSpeechSupport = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-      var textFromSpeech = recognizedFinal.trim();
-      var isConfident = hasWebSpeechSupport && textFromSpeech.length > 2 && !recognitionErrorOccurred;
+      // Show temporary processing state in result card
+      if (voiceResultCard) {
+        voiceResultCard.className = 'voice-result-card';
+        voiceResultCard.style.display = 'flex';
+      }
+      if (voiceResultIcon) voiceResultIcon.textContent = '⏳';
+      if (voiceResultTitle) voiceResultTitle.textContent = 'Wird mit Deepgram KI verarbeitet...';
+      if (voiceResultStatus) voiceResultStatus.textContent = 'Sprache wird mit Deepgram Nova-2 in Text umgewandelt...';
 
-      if (isConfident) {
-        // Confident STT: The speech was parsed live into the textarea
-        if (voiceResultCard) {
-          voiceResultCard.className = 'voice-result-card success-stt';
-          voiceResultCard.style.display = 'flex';
-        }
-        if (voiceResultIcon) voiceResultIcon.textContent = '✨';
-        if (voiceResultTitle) voiceResultTitle.textContent = 'Sprache erfolgreich in Text umgewandelt!';
-        if (voiceResultStatus) {
-          voiceResultStatus.textContent = 'Dein Text steht oben im Eingabefeld. Du kannst ihn dort frei anpassen.';
-        }
-        if (voiceDriveToggle) {
-          voiceDriveToggle.checked = true;
-          voiceDriveToggle.disabled = false;
-        }
-        if (voiceDriveToggleText) {
-          voiceDriveToggleText.textContent = '☁️ Original-Sprachnachricht auch im Google Drive speichern';
-        }
+      // Call Deepgram AI Speech-to-Text API
+      transcribeWithDeepgram(voiceBlob)
+        .then(function (res) {
+          var transcript = (res.transcript || '').trim();
+          var confidence = res.confidence;
 
-        // Sync file attachment based on toggle
-        syncVoiceAttachmentWithToggle();
+          if (transcript.length > 0 && confidence >= 0.4) {
+            // =========================================================================
+            // SUCCESS: Deepgram parsed the speech into text!
+            // =========================================================================
+            var combinedText = (preExistingText ? preExistingText + ' ' : '') + transcript;
+            if (storyInput) {
+              storyInput.value = combinedText.trim();
+            }
 
-      } else {
-        // Not confident, speech recognition not supported (e.g. Firefox), or no clear speech recognized:
-        // Automatically send voice note to Google Drive!
-        if (voiceResultCard) {
-          voiceResultCard.className = 'voice-result-card fallback-drive';
-          voiceResultCard.style.display = 'flex';
-        }
-        if (voiceResultIcon) voiceResultIcon.textContent = '🎙️';
-        if (voiceResultTitle) voiceResultTitle.textContent = 'Sprachnachricht aufgenommen';
-        if (voiceResultStatus) {
-          voiceResultStatus.textContent = 'Wird als Audiodatei direkt in dein Google Drive übertragen.';
-        }
-        if (voiceDriveToggle) {
-          voiceDriveToggle.checked = true;
-          voiceDriveToggle.disabled = true; // Required since speech wasn't converted to text
-        }
-        if (voiceDriveToggleText) {
-          voiceDriveToggleText.textContent = '☁️ Wird als Sprachnachricht direkt in dein Google Drive übertragen';
-        }
+            if (voiceResultCard) {
+              voiceResultCard.className = 'voice-result-card success-stt';
+            }
+            if (voiceResultIcon) voiceResultIcon.textContent = '⚡';
+            if (voiceResultTitle) voiceResultTitle.textContent = 'Mit Deepgram KI erfolgreich transkribiert!';
+            if (voiceResultStatus) {
+              var percent = Math.round(confidence * 100);
+              voiceResultStatus.textContent = 'Genauigkeit: ' + percent + '% • Der Text steht oben im Eingabefeld.';
+            }
 
-        // Attach voice note directly to form upload
-        attachVoiceNote();
+            if (voiceDriveToggle) {
+              voiceDriveToggle.checked = true;
+              voiceDriveToggle.disabled = false;
+            }
+            if (voiceDriveToggleText) {
+              voiceDriveToggleText.textContent = '☁️ Original-Sprachnachricht auch im Google Drive speichern';
+            }
 
-        // If story textarea is empty or still has only the pre-existing text, provide a clean note
-        if (storyInput && (!storyInput.value.trim() || storyInput.value.trim() === preExistingText)) {
-          var timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-          storyInput.value = (preExistingText ? preExistingText + '\n\n' : '') + '🎙️ Sprachnachricht aufgenommen (' + timeStr + ' Uhr)';
-        }
+            syncVoiceAttachmentWithToggle();
 
-        // Remove required attribute so form submission doesn't block if only audio is sent
-        if (storyInput) {
-          storyInput.removeAttribute('required');
-        }
+          } else {
+            // Low confidence or empty transcript -> Send voice note to Google Drive
+            applyDriveVoiceNoteFallback('Deepgram konnte keinen eindeutigen Text erkennen');
+          }
+        })
+        .catch(function (err) {
+          console.warn('Deepgram processing notice:', err.message);
+
+          // If browser STT had caught text during recording, we can keep it
+          if (liveInterimText && liveInterimText.trim().length > 3) {
+            if (voiceResultCard) {
+              voiceResultCard.className = 'voice-result-card success-stt';
+            }
+            if (voiceResultIcon) voiceResultIcon.textContent = '✨';
+            if (voiceResultTitle) voiceResultTitle.textContent = 'Sprache in Text umgewandelt';
+            if (voiceResultStatus) {
+              voiceResultStatus.textContent = 'Text steht im Eingabefeld. Sprachnachricht kann zusätzlich an Google Drive gesendet werden.';
+            }
+            syncVoiceAttachmentWithToggle();
+          } else {
+            // Fallback: Send voice note directly to Google Drive
+            applyDriveVoiceNoteFallback('Audiodatei wird direkt an Google Drive gesendet');
+          }
+        });
+    }
+
+    function applyDriveVoiceNoteFallback(reasonText) {
+      if (voiceResultCard) {
+        voiceResultCard.className = 'voice-result-card fallback-drive';
+        voiceResultCard.style.display = 'flex';
+      }
+      if (voiceResultIcon) voiceResultIcon.textContent = '🎙️';
+      if (voiceResultTitle) voiceResultTitle.textContent = 'Sprachnachricht aufgenommen';
+      if (voiceResultStatus) {
+        voiceResultStatus.textContent = (reasonText ? reasonText + ' – ' : '') + 'Wird sicher in dein Google Drive übertragen.';
+      }
+      if (voiceDriveToggle) {
+        voiceDriveToggle.checked = true;
+        voiceDriveToggle.disabled = true; // Mandatory voice note upload
+      }
+      if (voiceDriveToggleText) {
+        voiceDriveToggleText.textContent = '☁️ Wird als Sprachnachricht direkt in dein Google Drive übertragen';
+      }
+
+      attachVoiceNote();
+
+      if (storyInput && (!storyInput.value.trim() || storyInput.value.trim() === preExistingText)) {
+        var timeStr = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        storyInput.value = (preExistingText ? preExistingText + '\n\n' : '') + '🎙️ Sprachnachricht aufgenommen (' + timeStr + ' Uhr)';
+      }
+
+      if (storyInput) {
+        storyInput.removeAttribute('required');
       }
     }
 
@@ -590,7 +652,7 @@
           voiceResultCard.style.display = 'none';
         }
 
-        // Re-enable required attribute on textarea
+        // Restore required attribute on textarea
         if (storyInput) {
           storyInput.setAttribute('required', 'required');
           if (storyInput.value.indexOf('🎙️ Sprachnachricht aufgenommen') !== -1) {
@@ -601,11 +663,12 @@
     }
 
     // =========================================================================
-    // Form Submission
+    // Form Submission (Uses GOOGLE_SCRIPT_WEBAPP_URL from Config)
     // =========================================================================
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
+      var scriptUrl = getConfig('GOOGLE_SCRIPT_WEBAPP_URL');
       var story = storyInput ? storyInput.value.trim() : '';
 
       // Fallback: If only an audio voice note was attached without extra text
@@ -641,17 +704,17 @@
         fileData: attachedBase64 || ''
       };
 
-      if (!GOOGLE_SCRIPT_WEBAPP_URL || GOOGLE_SCRIPT_WEBAPP_URL === "") {
+      if (!scriptUrl) {
         setTimeout(function () {
           showSuccess(
             'Story / Sprachnachricht erfasst! (Demo-Modus)',
-            'Vergelt\'s Gott! Deine Geschichte wurde erfasst. Sobald deine Google Apps Script URL hinterlegt ist, wandert alles direkt in dein Google Sheet & Drive!'
+            'Vergelt\'s Gott! Deine Geschichte wurde erfasst. Sobald deine Google Apps Script URL in den GitHub Secrets oder in config.local.js hinterlegt ist, wandert alles direkt in dein Google Sheet & Drive!'
           );
         }, 1000);
         return;
       }
 
-      fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
+      fetch(scriptUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },

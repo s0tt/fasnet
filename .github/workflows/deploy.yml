@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Inject Repository Secrets into config.js
+        env:
+          DEEPGRAM_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
+          SCRIPT_URL: ${{ secrets.GOOGLE_SCRIPT_WEBAPP_URL }}
+        run: |
+          # Replace placeholders with GitHub Repository Secrets if present
+          if [ -n "$DEEPGRAM_KEY" ]; then
+            sed -i "s|__DEEPGRAM_API_KEY__|$DEEPGRAM_KEY|g" js/config.js
+          fi
+          if [ -n "$SCRIPT_URL" ]; then
+            sed -i "s|__GOOGLE_SCRIPT_WEBAPP_URL__|$SCRIPT_URL|g" js/config.js
+          fi
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
