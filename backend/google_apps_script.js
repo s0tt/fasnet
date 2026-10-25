@@ -32,11 +32,22 @@ function doPost(e) {
     var fileData = data.fileData || ""; // Base64
     var timestamp = new Date();
 
-    if (!story) {
+    var isVoiceNote = (fileType.indexOf("audio") !== -1 || (fileName && fileName.toLowerCase().indexOf("sprachnachricht") !== -1));
+
+    if (!story && !fileData) {
       return ContentService.createTextOutput(JSON.stringify({
         status: "error",
-        message: "Keine Geschichte übermittelt."
+        message: "Keine Geschichte oder Sprachnachricht übermittelt."
       })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (!story && fileData) {
+      story = isVoiceNote 
+        ? "🎙️ Sprachnachricht (Audiodatei direkt im Google Drive gespeichert)" 
+        : "📎 Mediendatei ohne Textbeschreibung";
+      if (title === "Ohne Titel") {
+        title = isVoiceNote ? "Sprachnachricht" : "Medien-Upload";
+      }
     }
 
     // 1. Google Drive Ordner finden oder anlegen
@@ -80,13 +91,13 @@ function doPost(e) {
     try {
       var userEmail = Session.getEffectiveUser().getEmail();
       if (userEmail) {
-        var emailSubject = "🎭 Neues Petzen eingegangen: " + title;
+        var emailSubject = (isVoiceNote ? "🎙️ Neue Sprachnachricht: " : "🎭 Neues Petzen eingegangen: ") + title;
         var emailBody = "Servus!\n\n" +
-          "Es wurde soeben eine neue Geschichte für die Fasnet 2027 eingereicht:\n\n" +
+          (isVoiceNote ? "Es wurde soeben eine neue Sprachnachricht für die Fasnet 2027 eingereicht!\n\n" : "Es wurde soeben eine neue Geschichte für die Fasnet 2027 eingereicht:\n\n") +
           "Titel: " + title + "\n" +
           "Datum: " + Utilities.formatDate(timestamp, "Europe/Berlin", "dd.MM.yyyy HH:mm:ss") + "\n\n" +
-          "Geschichte:\n" + story + "\n\n" +
-          "Medien-Anhang:\n" + fileUrl + "\n\n" +
+          "Inhalt / Transkript:\n" + story + "\n\n" +
+          (fileUrl !== "Kein Anhang" ? "Dateianhang / Sprachnachricht (Google Drive Link):\n" + fileUrl + "\n\n" : "") +
           "Direkt zum Google Sheet:\n" + SpreadsheetApp.getActiveSpreadsheet().getUrl() + "\n\n" +
           "Narri - Narro!";
 

@@ -216,6 +216,13 @@
           setPlayingState(true);
         }).catch(function () {});
       },
+      pause: function () {
+        playerAudio.pause();
+        setPlayingState(false);
+      },
+      isPlaying: function () {
+        return !playerAudio.paused;
+      },
       toggle: togglePlay
     };
   }

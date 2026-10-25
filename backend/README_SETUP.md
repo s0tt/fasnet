@@ -45,6 +45,7 @@ Mit dieser Anleitung richtest du das kostenlose Backend für das **Petz-Portal**
 ---
 
 ## Was passiert nach dem Absenden?
-- **Text & Anekdoten**: Erscheinen sofort als neue Zeile in deinem Google Sheet (mit Datum, Uhrzeit, Titel und Text).
-- **Fotos / Audios / Videos**: Werden automatisch in einen Google Drive Ordner namens `Fasnet_2027_Petzportal_Medien` hochgeladen und in der Tabelle direkt verlinkt.
-- **Gmail**: Du erhältst sofort eine kurze Info-Mail, wenn etwas Neues gepetzt wurde!
+- **Text & Diktierte Sprache (Speech-to-Text)**: Erscheinen sofort als neue Zeile in deinem Google Sheet (mit Datum, Uhrzeit, Titel und Text).
+- **Sprachnachrichten & Sprach-Memos**: Wenn Sprache aufgenommen wird (oder Spracherkennung nicht eindeutig war), wird die Original-Audiodatei direkt in deinen Google Drive Ordner `Fasnet_2027_Petzportal_Medien` gespeichert und in der Tabelle direkt mit Abspiellink verlinkt!
+- **Fotos / Videos**: Werden ebenfalls automatisch im Google Drive Ordner abgelegt.
+- **Gmail**: Du erhältst sofort eine kurze Info-Mail (z. B. `🎙️ Neue Sprachnachricht: ...` oder `🎭 Neues Petzen eingegangen: ...`), wenn etwas Neues gepetzt wurde!

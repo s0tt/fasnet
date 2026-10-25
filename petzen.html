@@ -65,29 +65,113 @@
         <!-- Anonymity Trust Shield -->
         <div class="trust-banner">
           <span class="trust-icon">🔒</span>
-          <span>100% Anonym • Keine Namenspflicht • Narrenehrenwort</span>
+          <span>100% Anonym • Keine Namenspflicht • Sprache-zu-Text & Sprachnachricht</span>
         </div>
       </header>
 
-      <!-- Simple Petzen Form Card: One Field, Media Button, Send Button -->
+      <!-- Petzen Form Card: Field, Voice/STT, Media Button, Send Button -->
       <section class="petzen-card">
         <form id="petzen-form" class="petzen-form-simple">
           
-          <!-- Only One Field -->
+          <!-- Story Text Area -->
           <div class="form-group petzen-field-group">
             <textarea 
               id="petzen-story" 
               class="petzen-story-input" 
-              placeholder="Was ist passiert? Wer war beteiligt? Hau frei raus... (100% anonym)"
+              placeholder="Was ist passiert? Wer war beteiligt? Hau frei raus... (100% anonym, getippt oder eingesprochen)"
               rows="6"
               required
             ></textarea>
           </div>
 
-          <!-- Bottom Action Bar: Media Button & Send Button -->
+          <!-- Active Voice Recording Panel (Live STT + MediaRecorder) -->
+          <div class="voice-recording-panel" id="voice-recording-panel" style="display: none;">
+            <div class="voice-panel-top">
+              <div class="voice-recording-indicator">
+                <span class="recording-pulse-dot"></span>
+                <span class="recording-label">Aufnahme läuft...</span>
+                <span class="recording-timer" id="recording-timer">00:00</span>
+              </div>
+              <div class="voice-soundwave" id="voice-soundwave">
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+                <span class="wave-bar"></span>
+              </div>
+            </div>
+
+            <div class="voice-live-hint" id="voice-live-hint">
+              🎙️ Sprich frei drauflos – wir wandeln deine Sprache live in Text um!
+            </div>
+
+            <div class="voice-recording-controls">
+              <button type="button" class="btn-voice-stop" id="btn-voice-stop">
+                ⏹ Aufnahme beenden
+              </button>
+              <button type="button" class="btn-voice-cancel" id="btn-voice-cancel" title="Aufnahme abbrechen">
+                ✕ Abbrechen
+              </button>
+            </div>
+          </div>
+
+          <!-- Voice Note Result & Audio Preview Card -->
+          <div class="voice-result-card" id="voice-result-card" style="display: none;">
+            <div class="voice-result-header">
+              <div class="voice-result-info">
+                <span class="voice-result-icon" id="voice-result-icon">✨</span>
+                <div class="voice-result-texts">
+                  <span class="voice-result-title" id="voice-result-title">Sprache erkannt</span>
+                  <span class="voice-result-status" id="voice-result-status">Text wurde ins Feld eingefügt</span>
+                </div>
+              </div>
+              <button type="button" class="voice-result-delete" id="voice-result-delete" title="Aufnahme entfernen">
+                ✕ Entfernen
+              </button>
+            </div>
+
+            <!-- Mini Audio Playback Player -->
+            <div class="voice-audio-preview" id="voice-audio-preview">
+              <button type="button" class="btn-audio-playback" id="btn-audio-playback" title="Aufnahme anhören" aria-label="Aufnahme anhören">
+                ▶
+              </button>
+              <div class="audio-progress-wrap" id="audio-progress-wrap">
+                <div class="audio-progress-bar" id="audio-progress-bar"></div>
+              </div>
+              <span class="audio-playback-time" id="audio-playback-time">00:00</span>
+              <audio id="voice-audio-element" preload="auto"></audio>
+            </div>
+
+            <!-- Drive Upload Option Toggle -->
+            <div class="voice-drive-badge" id="voice-drive-badge">
+              <label class="voice-drive-toggle-label" for="voice-upload-drive-toggle">
+                <input type="checkbox" id="voice-upload-drive-toggle" checked>
+                <span class="toggle-text" id="voice-drive-toggle-text">
+                  ☁️ Original-Sprachnachricht auch im Google Drive speichern
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar: Voice Button, Media Button & Send Button -->
           <div class="petzen-action-bar">
-            <!-- Media Button -->
+            <!-- Media and Voice Tools -->
             <div class="petzen-media-wrapper">
+              <!-- Voice / Speech to Text Button -->
+              <button 
+                type="button" 
+                class="btn-voice-record" 
+                id="btn-voice-record" 
+                title="Sprachnachricht einsprechen oder diktieren"
+                aria-label="Sprachnachricht aufnehmen oder diktieren"
+              >
+                <span class="voice-mic-icon" id="voice-mic-icon">🎙️</span>
+                <span id="voice-btn-text">Diktieren / Sprechen</span>
+              </button>
+
+              <!-- Media File Picker -->
               <input 
                 type="file" 
                 id="file-input" 
@@ -96,7 +180,7 @@
               >
               <label for="file-input" class="btn-media-picker" id="media-picker-label" title="Foto oder Video auswählen">
                 <span class="media-icon">📷</span>
-                <span id="media-btn-text">Foto / Video hinzufügen</span>
+                <span id="media-btn-text">Foto / Video</span>
               </label>
 
               <!-- Chosen file preview badge -->
