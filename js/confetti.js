@@ -168,22 +168,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // When entering the main page, drop 2 times in a row confetti
-  var isMainPage = document.getElementById('fahrplan') !== null || 
-                   window.location.pathname.endsWith('index.html') || 
-                   window.location.pathname.endsWith('/') || 
-                   window.location.pathname === '';
-
-  if (isMainPage) {
-    setTimeout(function () {
-      if (window.confetti && typeof window.confetti.doubleDrop === 'function') {
-        window.confetti.doubleDrop();
-      } else if (window.confetti) {
+  // When entering the website (main page or petzen page), drop 2 times in a row confetti as default
+  setTimeout(function () {
+    if (window.confetti && typeof window.confetti.doubleDrop === 'function') {
+      window.confetti.doubleDrop();
+    } else if (window.confetti) {
+      window.confetti.burst();
+      setTimeout(function () {
         window.confetti.burst();
-        setTimeout(function () {
-          window.confetti.burst();
-        }, 750);
-      }
-    }, 400);
-  }
+      }, 750);
+    }
+  }, 400);
 });
