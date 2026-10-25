@@ -206,13 +206,14 @@
     }
 
     container.innerHTML = filtered.map(function (ev) {
-      var cardClass = 'event-card' + (ev.featured ? ' featured' : '') + (ev.category === 'hauptfasnet' ? ' highlight' : '');
+      var cardClass = 'event-card is-tbd' + (ev.featured ? ' featured' : '') + (ev.category === 'hauptfasnet' ? ' highlight' : '');
       var subListHtml = ev.subPoints && ev.subPoints.length > 0
         ? '<ul class="event-sub-points">' + ev.subPoints.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul>'
         : '';
 
       return (
         '<article class="' + cardClass + '" data-id="' + ev.id + '">' +
+          '<div class="tbd-corner-ribbon">TBD</div>' +
           '<div class="event-date-box">' +
             '<span class="event-weekday">' + ev.weekday + '</span>' +
             '<span class="event-day">' + ev.day + '</span>' +
@@ -223,13 +224,14 @@
               '<span class="event-time">⏰ ' + ev.time + '</span>' +
               '<span class="event-location">📍 ' + ev.location + '</span>' +
               '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>' +
+              '<span class="badge-tag badge-tbd">⏳ In Planung • TBD</span>' +
             '</div>' +
             '<h3 class="event-title">' + ev.title + '</h3>' +
             '<p class="event-desc">' + ev.desc + '</p>' +
             subListHtml +
           '</div>' +
           '<div class="event-actions">' +
-            '<button class="btn-cal-add" onclick="window.fasnetCalendar.exportSingle(\'' + ev.id + '\')">' +
+            '<button class="btn-cal-add" onclick="window.fasnetCalendar.exportSingle(\'' + ev.id + '\')" title="Vorläufigen Termin in Kalender eintragen">' +
               '📅 In Kalender' +
             '</button>' +
           '</div>' +
@@ -325,8 +327,8 @@
       lines.push('DTSTAMP:' + formatICSDate(new Date()));
       lines.push('DTSTART:' + formatICSDate(ev.startDate));
       lines.push('DTEND:' + formatICSDate(ev.endDate));
-      lines.push('SUMMARY:' + ev.title + ' – Fasnet Salmendingen');
-      lines.push('DESCRIPTION:' + ev.desc.replace(/,/g, '\\,'));
+      lines.push('SUMMARY:[VORLÄUFIG / TBD] ' + ev.title + ' – Fasnet Salmendingen');
+      lines.push('DESCRIPTION:[HINWEIS: Termin in Abstimmung (TBD) durch den Elferrat] ' + ev.desc.replace(/,/g, '\\,'));
       lines.push('LOCATION:' + ev.location.replace(/,/g, '\\,'));
       lines.push('STATUS:CONFIRMED');
       lines.push('END:VEVENT');
