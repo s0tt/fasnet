@@ -190,6 +190,49 @@
     }
   ];
 
+  // Render single event card HTML
+  function renderEventCardHtml(ev, isConfirmed) {
+    var cardClass = 'event-card' + (isConfirmed ? ' confirmed-card' : ' is-tbd-card') + (ev.featured ? ' featured' : '') + (ev.category === 'hauptfasnet' ? ' highlight' : '');
+    var subListHtml = ev.subPoints && ev.subPoints.length > 0
+      ? '<ul class="event-sub-points">' + ev.subPoints.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul>'
+      : '';
+
+    var badgeTagHtml = isConfirmed
+      ? '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>' +
+        '<span class="badge-tag badge-confirmed">✅ Geplant &amp; Fest</span>'
+      : '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>' +
+        '<span class="badge-tag badge-tbd">⏳ In Planung • TBD</span>';
+
+    var actionHtml = isConfirmed
+      ? '<div class="event-actions">' +
+          '<button class="btn-cal-add" onclick="window.fasnetCalendar.exportSingle(\'' + ev.id + '\')" title="Fasnetsbeginn in Kalender eintragen">' +
+            '📅 In Kalender' +
+          '</button>' +
+        '</div>'
+      : '';
+
+    return (
+      '<article class="' + cardClass + '" data-id="' + ev.id + '">' +
+        '<div class="event-date-box">' +
+          '<span class="event-weekday">' + ev.weekday + '</span>' +
+          '<span class="event-day">' + ev.day + '</span>' +
+          '<span class="event-month">' + ev.month + '</span>' +
+        '</div>' +
+        '<div class="event-details">' +
+          '<div class="event-meta-row">' +
+            '<span class="event-time">⏰ ' + ev.time + '</span>' +
+            '<span class="event-location">📍 ' + ev.location + '</span>' +
+            badgeTagHtml +
+          '</div>' +
+          '<h3 class="event-title">' + ev.title + '</h3>' +
+          '<p class="event-desc">' + ev.desc + '</p>' +
+          subListHtml +
+        '</div>' +
+        actionHtml +
+      '</article>'
+    );
+  }
+
   // Render Event Cards
   function renderEvents(filterCategory) {
     var container = document.getElementById('events-container');
@@ -205,39 +248,46 @@
       });
     }
 
-    container.innerHTML = filtered.map(function (ev) {
-      var cardClass = 'event-card is-tbd' + (ev.featured ? ' featured' : '') + (ev.category === 'hauptfasnet' ? ' highlight' : '');
-      var subListHtml = ev.subPoints && ev.subPoints.length > 0
-        ? '<ul class="event-sub-points">' + ev.subPoints.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ul>'
-        : '';
+    var confirmedEvents = filtered.filter(function (e) { return e.id === 'kampagnenstart'; });
+    var tbdEvents = filtered.filter(function (e) { return e.id !== 'kampagnenstart'; });
 
-      return (
-        '<article class="' + cardClass + '" data-id="' + ev.id + '">' +
-          '<div class="tbd-corner-ribbon">TBD</div>' +
-          '<div class="event-date-box">' +
-            '<span class="event-weekday">' + ev.weekday + '</span>' +
-            '<span class="event-day">' + ev.day + '</span>' +
-            '<span class="event-month">' + ev.month + '</span>' +
-          '</div>' +
-          '<div class="event-details">' +
-            '<div class="event-meta-row">' +
-              '<span class="event-time">⏰ ' + ev.time + '</span>' +
-              '<span class="event-location">📍 ' + ev.location + '</span>' +
-              '<span class="badge-tag ' + ev.badgeClass + '">' + ev.badge + '</span>' +
-              '<span class="badge-tag badge-tbd">⏳ In Planung • TBD</span>' +
-            '</div>' +
-            '<h3 class="event-title">' + ev.title + '</h3>' +
-            '<p class="event-desc">' + ev.desc + '</p>' +
-            subListHtml +
-          '</div>' +
-          '<div class="event-actions">' +
-            '<button class="btn-cal-add" onclick="window.fasnetCalendar.exportSingle(\'' + ev.id + '\')" title="Vorläufigen Termin in Kalender eintragen">' +
-              '📅 In Kalender' +
-            '</button>' +
-          '</div>' +
-        '</article>'
-      );
-    }).join('');
+    var html = '';
+
+    // Confirmed planned event (11.11.) rendered at full fidelity
+    if (confirmedEvents.length > 0) {
+      html += '<div class="confirmed-events-wrap">';
+      html += confirmedEvents.map(function (ev) {
+        return renderEventCardHtml(ev, true);
+      }).join('');
+      html += '</div>';
+    }
+
+    // Tentative 2027 events rendered greyed out with prominent overlay banner
+    if (tbdEvents.length > 0) {
+      html += '<div class="tbd-timetable-wrapper">';
+      html += '  <div class="tbd-overlay" aria-hidden="false">';
+      html += '    <div class="tbd-overlay-card">';
+      html += '      <div class="tbd-overlay-icon-wrap"><span class="tbd-overlay-icon">⏳</span></div>';
+      html += '      <span class="tbd-overlay-pill">In Abstimmung • TBD</span>';
+      html += '      <h3 class="tbd-overlay-title">Fahrplan 2027 noch in Vorbereitung</h3>';
+      html += '      <p class="tbd-overlay-text">';
+      html += '        Der offizielle Narrenfahrplan für die Fasnet 2027 wird aktuell vom Elferrat final ausgearbeitet.<br>';
+      html += '        Bis auf den <strong>Fasnetsbeginn (11.11.)</strong> sind alle weiteren Termine noch vorläufig!';
+      html += '      </p>';
+      html += '      <div class="tbd-overlay-actions">';
+      html += '        <a href="./petzen.html" class="btn btn-petzen tbd-cta-btn">🤫 Jetzt Dorfgeheimnis petzen</a>';
+      html += '      </div>';
+      html += '    </div>';
+      html += '  </div>';
+      html += '  <div class="tbd-events-grid">';
+      html += tbdEvents.map(function (ev) {
+        return renderEventCardHtml(ev, false);
+      }).join('');
+      html += '  </div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
   }
 
   // Live Countdown logic
@@ -327,8 +377,13 @@
       lines.push('DTSTAMP:' + formatICSDate(new Date()));
       lines.push('DTSTART:' + formatICSDate(ev.startDate));
       lines.push('DTEND:' + formatICSDate(ev.endDate));
-      lines.push('SUMMARY:[VORLÄUFIG / TBD] ' + ev.title + ' – Fasnet Salmendingen');
-      lines.push('DESCRIPTION:[HINWEIS: Termin in Abstimmung (TBD) durch den Elferrat] ' + ev.desc.replace(/,/g, '\\,'));
+      if (ev.id === 'kampagnenstart') {
+        lines.push('SUMMARY:' + ev.title + ' – Fasnet Salmendingen');
+        lines.push('DESCRIPTION:' + ev.desc.replace(/,/g, '\\,'));
+      } else {
+        lines.push('SUMMARY:[VORLÄUFIG / TBD] ' + ev.title + ' – Fasnet Salmendingen');
+        lines.push('DESCRIPTION:[HINWEIS: Termin in Abstimmung (TBD) durch den Elferrat] ' + ev.desc.replace(/,/g, '\\,'));
+      }
       lines.push('LOCATION:' + ev.location.replace(/,/g, '\\,'));
       lines.push('STATUS:CONFIRMED');
       lines.push('END:VEVENT');

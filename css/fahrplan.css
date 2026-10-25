@@ -325,130 +325,184 @@
 }
 
 /* ==========================================================================
-   Timetable TBD / Work-in-Progress Notice & Greyed-out Styles
+   Timetable TBD Overlay & Greyed-out Treatment
    ========================================================================== */
-.timetable-tbd-banner {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 2px dashed #f59e0b;
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 1.75rem;
+
+/* Confirmed 11.11. Event Wrapper */
+.confirmed-events-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.confirmed-card {
+  border-left: 6px solid #16a34a !important;
+  box-shadow: 0 4px 20px rgba(22, 163, 74, 0.12) !important;
+}
+
+.badge-tag.badge-confirmed {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+  font-weight: 800;
+}
+
+/* Wrapper for the tentative 2027 timetable */
+.tbd-timetable-wrapper {
+  position: relative;
+  border-radius: var(--radius-xl);
   margin-bottom: 2rem;
+}
+
+/* The Overlay Banner sitting right across the greyed-out fields */
+.tbd-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  pointer-events: none; /* Allows natural wheel/touch scrolling across fields */
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.12);
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2.5rem 1rem;
+}
+
+.tbd-overlay-card {
+  pointer-events: auto; /* CTAs and links inside the card are clickable */
+  position: sticky;
+  top: 110px;
+  max-width: 580px;
+  width: 100%;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 3px solid #f59e0b;
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(245, 158, 11, 0.35);
   animation: fadeIn 0.4s ease;
 }
 
-.tbd-banner-icon {
-  font-size: 2.5rem;
+.tbd-overlay-icon-wrap {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 1rem;
+  background: #fef3c7;
+  border: 2px solid #fcd34d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+}
+
+.tbd-overlay-icon {
+  font-size: 2.2rem;
   line-height: 1;
-  flex-shrink: 0;
   animation: pulse-tbd-icon 2s infinite ease-in-out;
 }
 
 @keyframes pulse-tbd-icon {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.12) rotate(6deg); }
+  50% { transform: scale(1.15) rotate(8deg); }
 }
 
-.tbd-banner-content {
-  flex: 1;
-}
-
-.tbd-banner-title {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #92400e;
-  margin-bottom: 0.35rem;
-}
-
-.tbd-pill {
+.tbd-overlay-pill {
+  display: inline-block;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   background: #f59e0b;
   color: #ffffff;
-  padding: 0.2rem 0.65rem;
+  padding: 0.28rem 0.9rem;
   border-radius: var(--radius-full);
+  margin-bottom: 0.85rem;
   box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
 }
 
-.tbd-banner-text {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: #78350f;
-  margin: 0;
+.tbd-overlay-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #92400e;
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
 }
 
-.tbd-banner-text strong {
+.tbd-overlay-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #78350f;
+  margin-bottom: 1.5rem;
+}
+
+.tbd-overlay-text strong {
   color: #451a03;
 }
 
-/* Event Timeline / Cards */
+.tbd-overlay-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.tbd-cta-btn {
+  font-size: 0.92rem;
+  padding: 0.7rem 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Greyed-out Event Fields Underneath */
+.tbd-events-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.tbd-events-grid .event-card {
+  opacity: 0.22;
+  filter: grayscale(100%);
+  pointer-events: none !important;
+  user-select: none !important;
+  border: 2px dashed #94a3b8 !important;
+  background: #f8fafc !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.tbd-events-grid .event-card .btn-cal-add {
+  display: none !important;
+}
+
+@media (max-width: 650px) {
+  .tbd-overlay-card {
+    top: 80px;
+    padding: 1.6rem 1.25rem;
+  }
+
+  .tbd-overlay-title {
+    font-size: 1.25rem;
+  }
+
+  .tbd-overlay-text {
+    font-size: 0.88rem;
+  }
+}
+
+/* Event Timeline / Cards Container */
 .events-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 4rem;
-}
-
-/* Greyed-out In-Progress Treatment */
-.events-container.is-tbd .event-card {
-  opacity: 0.85;
-  filter: grayscale(22%);
-  border-style: dashed;
-  border-color: #cbd5e1;
-  transition: all var(--transition-normal);
-}
-
-.events-container.is-tbd .event-card:hover {
-  opacity: 1;
-  filter: grayscale(0%);
-  border-color: var(--color-primary-light);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-xl);
-}
-
-/* Corner Ribbon on Event Cards */
-.tbd-corner-ribbon {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
-  font-family: var(--font-heading);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.badge-tag.badge-tbd {
-  background: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
-  font-weight: 700;
-}
-
-@media (max-width: 650px) {
-  .timetable-tbd-banner {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1.25rem;
-  }
 }
 
 .event-card {
