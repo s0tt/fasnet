@@ -199,15 +199,19 @@
       });
     }
 
-    // Attempt playback immediately
-    attemptPlayback();
+    // Autoplay policy: Only autoplay on the main page (index.html / root), NOT on the petzen site
+    var isPetzenPage = window.location.pathname.indexOf('petzen') !== -1 || !!document.querySelector('.petzen-page');
+    if (!isPetzenPage) {
+      // Attempt playback immediately
+      attemptPlayback();
 
-    // Also attempt on window load
-    window.addEventListener('load', function () {
-      if (playerAudio.paused) {
-        attemptPlayback();
-      }
-    });
+      // Also attempt on window load
+      window.addEventListener('load', function () {
+        if (playerAudio.paused) {
+          attemptPlayback();
+        }
+      });
+    }
 
     // Expose global helper
     window.fasnetPlayer = {
