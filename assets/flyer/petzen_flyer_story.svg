@@ -95,10 +95,10 @@
     <text x="540" y="600" 
           text-anchor="middle" 
           class="font-fredoka cursor-text" 
-          font-size="44" 
+          font-size="40" 
           font-weight="700" 
           fill="#d5e4ff" 
-          letter-spacing="0.5">S WIRD DOCH NIX BASSIERT SEI...</text>
+          letter-spacing="0.5">S WIRD DOCH NIX BASSIERT SEI... ODER DOCH?</text>
   </g>
 
   <!-- =========================================================================

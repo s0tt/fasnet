@@ -101,10 +101,10 @@
     <text x="540" y="380" 
           text-anchor="middle" 
           class="font-fredoka cursor-text" 
-          font-size="36" 
+          font-size="34" 
           font-weight="700" 
           fill="#d5e4ff" 
-          letter-spacing="0.5">S WIRD DOCH NIX BASSIERT SEI...</text>
+          letter-spacing="0.5">S WIRD DOCH NIX BASSIERT SEI... ODER DOCH?</text>
   </g>
 
   <!-- =========================================================================
